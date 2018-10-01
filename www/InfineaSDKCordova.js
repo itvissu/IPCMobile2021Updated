@@ -64,6 +64,29 @@ BATTERY_CHIP_NONE: 0,
 BATTERY_CHIP_BQ27421: 1,
 };
 
+var SCAN_MODES = {
+    /**
+     The scan will be terminated after successful barcode recognition (default)
+     */
+    MODE_SINGLE_SCAN: 0,
+    /**
+     Scanning will continue unless either scan button is releasd, or stop scan function is called
+     */
+    MODE_MULTI_SCAN: 1,
+    /**
+     For as long as scan button is pressed or stop scan is not called the engine will operate in low power scan mode trying to detect objects entering the area, then will turn on the lights and try to read the barcode. Supported only on Code engine.
+     */
+    MODE_MOTION_DETECT: 2,
+    /**
+     Pressing the button/start scan will enter aim mode, while a barcode scan will actually be performed upon button release/stop scan.
+     */
+    MODE_SINGLE_SCAN_RELEASE: 3,
+    /**
+     Same as multi scan mode, but allowing no duplicate barcodes to be scanned
+     */
+    MODE_MULTI_SCAN_NO_DUPLICATES: 4,
+};
+
 
 // ******* SDK Delegates ********
 // These functions will be called when the scanner receives these events
@@ -120,6 +143,22 @@ exports.magneticCardReadFailed = function (source, reason) {
  */
 exports.magneticCardEncryptedData = function (encryption, tracks, data) {
     
+};
+
+/**
+ * Called when a hardware button is pressed
+ * @param {int} which Button index
+ */
+exports.deviceButtonPressed = function (which) {
+
+};
+
+/**
+ * Called when a hardware button released
+ * @param {int} which Button index
+ */
+exports.deviceButtonReleased = function (which) {
+
 };
 
 // ******************************
@@ -239,4 +278,58 @@ exports.rfInit = function (error) {
  */
 exports.rfClose = function (error) {
     exec(null, error, 'InfineaSDKCordova', 'rfClose', []);
+};
+
+/**
+ * Get the scan button mode
+ * @param {function} success The scan button mode will be passed in as boolean
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.barcodeGetScanButtonMode = function (success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'barcodeGetScanButtonMode', []);
+};
+
+/**
+ * Enable or Disable scan button.
+ * @param {boolean} scanButtonMode true or false
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.barcodeSetScanButtonMode = function (scanButtonMode, error) {
+    exec(null, error, 'InfineaSDKCordova', 'barcodeSetScanButtonMode', [scanButtonMode]);
+};
+
+/**
+ * Get the current barcode scan mode, one of SCAN_MODES
+ * @param {function} success The scan mode will be passed in here, one of SCAN_MODES
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.barcodeGetScanMode = function (success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'barcodeGetScanMode', []);
+};
+
+/**
+ * Set a specific scan mode, one of SCAN_MODES
+ * @param {int} scanMode One of SCAN_MODES
+ * @param {*} error The error reason will be passed in if available
+ */
+exports.barcodeSetScanMode = function (scanMode, error) {
+    exec(null, error, 'InfineaSDKCordova', 'barcodeSetScanMode', [scanMode]);
+};
+
+/**
+ * Start scan engine. Can be used for on screen scan button
+ * @param {function} success Called if execution success
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.barcodeStartScan = function (success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'barcodeStartScan', []);
+};
+
+/**
+ * Stop scan engine. If using an on screen scan button, call this after a barcode is read.
+ * @param {function} success Called if execution success
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.barcodeStopScan = function (success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'barcodeStopScan', []);
 };

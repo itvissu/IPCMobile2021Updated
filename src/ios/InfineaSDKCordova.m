@@ -1,5 +1,6 @@
 /********* InfineaSDKCordova.m Cordova Plugin Implementation *******/
 
+#import <WebKit/WebKit.h>
 #import <Cordova/CDV.h>
 #import <InfineaSDK/InfineaSDK.h>
 
@@ -24,21 +25,18 @@
 - (void)setAutoOffWhenIdle:(CDVInvokedUrlCommand*)command;
 - (void)rfInit:(CDVInvokedUrlCommand*)command;
 - (void)rfClose:(CDVInvokedUrlCommand*)command;
+- (void)barcodeGetScanButtonMode:(CDVInvokedUrlCommand*)command;
+- (void)barcodeSetScanButtonMode:(CDVInvokedUrlCommand*)command;
+- (void)barcodeGetScanMode:(CDVInvokedUrlCommand*)command;
+- (void)barcodeSetScanMode:(CDVInvokedUrlCommand*)command;
+- (void)barcodeStartScan:(CDVInvokedUrlCommand*)command;
+- (void)barcodeStopScan:(CDVInvokedUrlCommand*)command;
 
 @end
 
 @implementation InfineaSDKCordova
 
-- (void)callback:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2)
-{
-    va_list args;
-    va_start(args, format);
-    NSString *javascript = [[NSString alloc] initWithFormat:format arguments:args];
-    va_end(args);
-    
-    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:javascript];
-}
-
+// Prototype
 - (void)coolMethod:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"Call coolMethod");
@@ -54,8 +52,133 @@
     
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
+// *********
 
-// ******************
+// Callback helper
+- (void)callback:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2)
+{
+    va_list args;
+    va_start(args, format);
+    NSString *javascript = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+    
+    //[(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:javascript];
+    
+    if ([self.webView isKindOfClass:WKWebView.class]) {
+        [(WKWebView*)self.webView evaluateJavaScript:javascript completionHandler:^(id result, NSError *error) {}];
+    }
+    else {
+        [(UIWebView*)self.webView stringByEvaluatingJavaScriptFromString: javascript];
+    }
+}
+
+// SDK API
+
+- (void)barcodeStartScan:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call barcodeStartScan");
+    
+    CDVPluginResult* pluginResult = nil;
+    
+    NSError *error;
+    BOOL isSuccess = [ipc barcodeStartScan:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)barcodeStopScan:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call barcodeStopScan");
+    
+    CDVPluginResult* pluginResult = nil;
+    
+    NSError *error;
+    BOOL isSuccess = [ipc barcodeStopScan:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)barcodeGetScanMode:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call barcodeGetScanMode");
+    
+    CDVPluginResult* pluginResult = nil;
+    
+    NSError *error;
+    int scanMode = 1;
+    BOOL isSuccess = [ipc barcodeGetScanMode:&scanMode error:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:scanMode];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)barcodeSetScanMode:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call barcodeSetScanMode");
+    
+    CDVPluginResult* pluginResult = nil;
+    int echo = [[command.arguments objectAtIndex:0] intValue];
+    
+    NSError *error;
+    BOOL isSuccess = [ipc barcodeSetScanMode:echo error:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)barcodeGetScanButtonMode:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call barcodeGetScanButtonMode");
+    
+    CDVPluginResult* pluginResult = nil;
+    
+    NSError *error;
+    int scanButtonMode = 1;
+    BOOL isSuccess = [ipc barcodeGetScanButtonMode:&scanButtonMode error:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:scanButtonMode];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)barcodeSetScanButtonMode:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call barcodeSetScanButtonMode");
+    
+    CDVPluginResult* pluginResult = nil;
+    int echo = [[command.arguments objectAtIndex:0] intValue];
+    
+    NSError *error;
+    BOOL isSuccess = [ipc barcodeSetScanButtonMode:echo error:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 - (void)rfClose:(CDVInvokedUrlCommand *)command
 {
@@ -295,19 +418,19 @@
 #pragma mark - IPCDeviceDelegate
 - (void)connectionState:(int)state
 {
-//    NSLog(@"Connection state: %i", state);
-//    NSString *js = [NSString stringWithFormat:@"Infinea.connectionState(%i)", state];
-//    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
+    //    NSLog(@"Connection state: %i", state);
+    //    NSString *js = [NSString stringWithFormat:@"Infinea.connectionState(%i)", state];
+    //    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
     
     [self callback:@"Infinea.connectionState(%i)", state];
 }
 
 - (void)barcodeData:(NSString *)barcode type:(int)type
 {
-//    NSLog(@"Barcode Data: %@", barcode);
-//    NSString *js = [NSString stringWithFormat:@"Infinea.barcodeData(%@, %i)", barcode, type];
-//    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
-
+    //    NSLog(@"Barcode Data: %@", barcode);
+    //    NSString *js = [NSString stringWithFormat:@"Infinea.barcodeData(%@, %i)", barcode, type];
+    //    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
+    
     [self callback:@"Infinea.barcodeData(%@, %i)", barcode, type];
 }
 
@@ -350,4 +473,15 @@
     [self callback:@"Infinea.magneticCardReadFailed(%i, %i)", source, -1];
 }
 
+- (void)deviceButtonPressed:(int)which
+{
+    [self callback:@"deviceButtonPressed(%i)", which];
+}
+
+- (void)deviceButtonReleased:(int)which
+{
+    [self callback:@"deviceButtonReleased(%i)", which];
+}
+
 @end
+

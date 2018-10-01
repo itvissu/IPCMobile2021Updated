@@ -46,6 +46,7 @@
         <framework src="AudioToolbox.framework" />
         <framework src="MediaPlayer.framework" />
         <framework src="CoreLocation.framework" />
+        <framework src="WebKit.framework" />
         <framework src="src/ios/InfineaSDK.framework" embed="true" custom="true" />
         
     </platform>
