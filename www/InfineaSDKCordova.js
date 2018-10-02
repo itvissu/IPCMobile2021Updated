@@ -1,7 +1,7 @@
 var exec = require('cordova/exec');
 
 // Enum
-var SUPPORTED_DEVICE_TYPES = {
+exports.SUPPORTED_DEVICE_TYPES = {
     /**
      All device types, used when setting active device
      */
@@ -44,7 +44,7 @@ DEVICE_TYPE_USB_MSR: 7,
 DEVICE_TYPE_HID_KEYBOARD: 8,
 };
 
-var CONN_STATES = {
+exports.CONN_STATES = {
     /**
      Device is disconnected, no automatic connection attempts will be made
      */
@@ -59,12 +59,12 @@ CONN_CONNECTING: 1,
 CONN_CONNECTED: 2
 };
 
-var BATTERY_CHIPS = {
+exports.BATTERY_CHIPS = {
 BATTERY_CHIP_NONE: 0,
 BATTERY_CHIP_BQ27421: 1,
 };
 
-var SCAN_MODES = {
+exports.SCAN_MODES = {
     /**
      The scan will be terminated after successful barcode recognition (default)
      */
