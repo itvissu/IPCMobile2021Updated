@@ -431,7 +431,7 @@
     //    NSString *js = [NSString stringWithFormat:@"Infinea.barcodeData(%@, %i)", barcode, type];
     //    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
     
-    [self callback:@"Infinea.barcodeData(%@, %i)", barcode, type];
+    [self callback:@"Infinea.barcodeData(\"%@\", %i)", barcode, type];
 }
 
 - (void)rfCardDetected:(int)cardIndex info:(DTRFCardInfo *)info
@@ -455,12 +455,12 @@
 
 - (void)magneticCardData:(NSString *)track1 track2:(NSString *)track2 track3:(NSString *)track3
 {
-    [self callback:@"Infinea.magneticCardData(%@, %@, %@)", track1, track2, track3];
+    [self callback:@"Infinea.magneticCardData(\"%@\", \"%@\", \"%@\")", track1, track2, track3];
 }
 
 - (void)magneticCardEncryptedData:(int)encryption tracks:(int)tracks data:(NSData *)data
 {
-    [self callback:@"Infinea.magneticCardEncryptedData(%i, %i, %@)", encryption, tracks, [NSString stringWithFormat:@"%@", data]];
+    [self callback:@"Infinea.magneticCardEncryptedData(%i, %i, \"%@\")", encryption, tracks, [NSString stringWithFormat:@"%@", data]];
 }
 
 - (void)magneticCardReadFailed:(int)source reason:(int)reason
@@ -475,12 +475,12 @@
 
 - (void)deviceButtonPressed:(int)which
 {
-    [self callback:@"deviceButtonPressed(%i)", which];
+    [self callback:@"Infinea.deviceButtonPressed(%i)", which];
 }
 
 - (void)deviceButtonReleased:(int)which
 {
-    [self callback:@"deviceButtonReleased(%i)", which];
+    [self callback:@"Infinea.deviceButtonReleased(%i)", which];
 }
 
 @end
