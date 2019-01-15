@@ -434,6 +434,25 @@
     [self callback:@"Infinea.barcodeData(\"%@\", %i)", barcode, type];
 }
 
+- (void)barcodeNSData:(NSData *)barcode type:(int)type
+{
+    // Hex data
+    NSString *hexData = [NSString stringWithFormat:@"%@", barcode];
+    hexData = [hexData stringByReplacingOccurrencesOfString:@"<" withString:@""];
+    hexData = [hexData stringByReplacingOccurrencesOfString:@">" withString:@""];
+    hexData = [hexData stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    // Ascii string
+    uint8_t *bytes=(uint8_t *)[barcode bytes];
+    NSMutableString *escapedString = [@"" mutableCopy];
+    for (int x = 0; x < barcode.length;x++)
+    {
+        [escapedString appendFormat:@"\\x%02X", bytes[x] ];
+    }
+    
+    [self callback:@"Infinea.barcodeNSData(\"%@\", %i)", hexData, type];
+}
+
 - (void)rfCardDetected:(int)cardIndex info:(DTRFCardInfo *)info
 {
     NSDictionary *cardInfo = @{@"type": @(info.type),
