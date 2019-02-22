@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-infineasdk.InfineaSDKCordova", function(require, exports, module) {
 var exec = require('cordova/exec');
 
 // Enum
@@ -98,6 +97,15 @@ exports.SCAN_MODES = {
  */
 exports.barcodeData = function (barcode, type) {
     
+};
+  
+/**
+* Callback from SDK
+* @param {array} barcodes The scanned barcode in decimal array. Need to combine them back into a string
+* @param {int} type The barcode type
+*/
+exports.barcodeDecimals = function (barcodes, type) {
+               
 };
                
 /**
@@ -343,5 +351,3 @@ exports.barcodeStartScan = function (success, error) {
 exports.barcodeStopScan = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'barcodeStopScan', []);
 };
-
-});

@@ -418,20 +418,26 @@
 #pragma mark - IPCDeviceDelegate
 - (void)connectionState:(int)state
 {
-    //    NSLog(@"Connection state: %i", state);
-    //    NSString *js = [NSString stringWithFormat:@"Infinea.connectionState(%i)", state];
-    //    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
-    
     [self callback:@"Infinea.connectionState(%i)", state];
 }
 
 - (void)barcodeData:(NSString *)barcode type:(int)type
 {
-    //    NSLog(@"Barcode Data: %@", barcode);
-    //    NSString *js = [NSString stringWithFormat:@"Infinea.barcodeData(%@, %i)", barcode, type];
-    //    [(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:js];
-    
+    // This send to regular barcodeData as string
     [self callback:@"Infinea.barcodeData(\"%@\", %i)", barcode, type];
+    
+    // Convert to decimal
+    const char *barcodes = [barcode UTF8String];
+    NSMutableArray *barcodeDecimalArray = [NSMutableArray new];
+    for (int i = 0; i < sizeof(barcodes); i++) {
+        NSString *string = [NSString stringWithFormat:@"%02d", barcodes[i]];
+        NSLog(@"%@", string);
+        [barcodeDecimalArray addObject:string];
+    }
+    NSString *barcodeDecimalString = [barcodeDecimalArray componentsJoinedByString:@","];
+    
+    // Send to barcodeDecimals as decimal array
+    [self callback:@"Infinea.barcodeDecimals([%@], %i)", barcodeDecimalString, type];
 }
 
 - (void)barcodeNSData:(NSData *)barcode type:(int)type
