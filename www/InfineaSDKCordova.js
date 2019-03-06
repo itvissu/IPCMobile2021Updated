@@ -5,63 +5,63 @@ exports.SUPPORTED_DEVICE_TYPES = {
     /**
      All device types, used when setting active device
      */
-DEVICE_TYPE_ALL: -1,
+    DEVICE_TYPE_ALL: -1,
     /**
      Linea Pro 1,2,3,4,4s, LineaTab
      */
-DEVICE_TYPE_LINEA: 0,
+    DEVICE_TYPE_LINEA: 0,
     /**
      Any of the supported printers - PP-60, DPP-250, DPP-350, DPP-450
      */
-DEVICE_TYPE_PRINTER: 1,
+    DEVICE_TYPE_PRINTER: 1,
     /**
      Any of the supported pinpads - MPED-400, PPAD1, BP50, BP500
      */
-DEVICE_TYPE_PINPAD: 2,
+    DEVICE_TYPE_PINPAD: 2,
     /**
      Transport device for connecting to other devices via bluetooth
      */
-DEVICE_TYPE_ISERIAL: 3,
+    DEVICE_TYPE_ISERIAL: 3,
     /**
      Any of the supported zebra printers - DPP-450
      */
-DEVICE_TYPE_PRINTER_ZPL: 4,
+    DEVICE_TYPE_PRINTER_ZPL: 4,
     /**
      Any of the supported iHUB devices
      */
-DEVICE_TYPE_IHUB: 5,
+    DEVICE_TYPE_IHUB: 5,
     /**
      Any of the supported HID barcode devices
      */
-DEVICE_TYPE_HID_BARCODE: 6,
+    DEVICE_TYPE_HID_BARCODE: 6,
     /**
      Any of the supported USB magnetic stripe reader devices
      */
-DEVICE_TYPE_USB_MSR: 7,
+    DEVICE_TYPE_USB_MSR: 7,
     /**
      HID keyboard devices
      */
-DEVICE_TYPE_HID_KEYBOARD: 8,
+    DEVICE_TYPE_HID_KEYBOARD: 8,
 };
 
 exports.CONN_STATES = {
     /**
      Device is disconnected, no automatic connection attempts will be made
      */
-CONN_DISCONNECTED: 0,
+    CONN_DISCONNECTED: 0,
     /**
      The SDK is trying to connect to the device
      */
-CONN_CONNECTING: 1,
+    CONN_CONNECTING: 1,
     /**
      Device is connected
      */
-CONN_CONNECTED: 2
+    CONN_CONNECTED: 2
 };
 
 exports.BATTERY_CHIPS = {
-BATTERY_CHIP_NONE: 0,
-BATTERY_CHIP_BQ27421: 1,
+    BATTERY_CHIP_NONE: 0,
+    BATTERY_CHIP_BQ27421: 1,
 };
 
 exports.SCAN_MODES = {
@@ -85,6 +85,29 @@ exports.SCAN_MODES = {
      Same as multi scan mode, but allowing no duplicate barcodes to be scanned
      */
     MODE_MULTI_SCAN_NO_DUPLICATES: 4,
+};
+
+exports.UPDATE_PHASE = {
+    /**
+    Initializing update
+    */
+    UPDATE_INIT: 0,
+    /**
+    Erasing old firmware/preparing memory
+    */
+    UPDATE_ERASE: 1,
+    /**
+    Writing data
+    */
+    UPDATE_WRITE: 2,
+    /**
+    Update complete, this is the final phase
+    */
+    UPDATE_FINISH: 3,
+    /**
+    Post-update operations
+    */
+    UPDATE_COMPLETING: 4
 };
 
 
@@ -127,7 +150,7 @@ exports.connectionState = function (state) {
 
 /**
  * Called when an wireless card is in the field. Should power off after successful read.
- * @param {int} cardIndex 
+ * @param {int} cardIndex
  * @param {key-value} cardInfo
  */
 exports.rfCardDetected = function (cardIndex, cardInfo) {
@@ -178,10 +201,19 @@ exports.deviceButtonPressed = function (which) {
 exports.deviceButtonReleased = function (which) {
 
 };
+               
+/**
+ * Called when a hardware button released
+ * @param {int} phase Update phase. One of UPDATE_PHASE
+ * @param {int} percent The percent complete
+ */
+exports.firmwareUpdateProgress = function (phase, percent) {
+
+};
 
 // ******************************
 
-
+// ***** Available functions ****
 /**
  * This must be the first function that gets called, and a valid develop key must be passed in, and validated, BEFORE any other functions get executed.
  * @param {string} key The developer key given by IPC
@@ -209,6 +241,25 @@ exports.disconnect = function () {
 };
 
 /**
+ * Get information of a specific firmware file. Info will be passed to success function
+ * @param {string} resourcePath The path to resource file with "platforms/ios/www/resources" as the root folder, your files must be copied to here. If you have "platforms/ios/www/resources/test.txt", only pass "test.txt" as resourcePath parameter.
+ * @param {function} success The success function which will receive the information dictionary.
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.getFirmwareFileInformation = function (resourcePath, success, error) {
+   exec(success, error, 'InfineaSDKCordova', 'getFirmwareFileInformation', [resourcePath]);
+};
+               
+/**
+ * Update firmware
+ * @param {string} resourcePath The path to resource file with "platforms/ios/www/resources" as the root folder, your files must be copied to here. If you have "platforms/ios/www/resources/test.txt", only pass "test.txt" as resourcePath parameter.
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.updateFirmwareData = function (resourcePath, error) {
+    exec(null, error, 'InfineaSDKCordova', 'updateFirmwareData', [resourcePath]);
+};
+               
+/**
  * Get the connected device info. Info will be passed to success function
  * @param {SUPPORTED_DEVICE_TYPES} deviceType
  * @param {function} success
@@ -227,6 +278,15 @@ exports.getConnectedDevicesInfo = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'getConnectedDevicesInfo', []);
 };
 
+/**
+ * Set sled's battery to charge iOS device.
+ * @param {bool} value true or false
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.setCharging = function (value, error) {
+    exec(null, error, 'InfineaSDKCordova', 'setCharging', [value]);
+};
+               
 /**
  * Set pass-thru sync
  * @param {bool} value true or false

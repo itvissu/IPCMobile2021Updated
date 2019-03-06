@@ -12,6 +12,7 @@
 
 - (void)coolMethod:(CDVInvokedUrlCommand*)command;
 
+// Available functions
 - (void)setDeveloperKey:(CDVInvokedUrlCommand *)command;
 - (void)connect:(CDVInvokedUrlCommand*)command;
 - (void)disconnect:(CDVInvokedUrlCommand*)command;
@@ -31,6 +32,9 @@
 - (void)barcodeSetScanMode:(CDVInvokedUrlCommand*)command;
 - (void)barcodeStartScan:(CDVInvokedUrlCommand*)command;
 - (void)barcodeStopScan:(CDVInvokedUrlCommand*)command;
+- (void)setCharging:(CDVInvokedUrlCommand*)command;
+- (void)getFirmwareFileInformation:(CDVInvokedUrlCommand*)command;
+- (void)updateFirmwareData:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -62,8 +66,6 @@
     NSString *javascript = [[NSString alloc] initWithFormat:format arguments:args];
     va_end(args);
     
-    //[(UIWebView *)self.webView stringByEvaluatingJavaScriptFromString:javascript];
-    
     if ([self.webView isKindOfClass:WKWebView.class]) {
         [(WKWebView*)self.webView evaluateJavaScript:javascript completionHandler:^(id result, NSError *error) {}];
     }
@@ -73,6 +75,23 @@
 }
 
 // SDK API
+- (void)setCharging:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call setCharging");
+    
+    CDVPluginResult* pluginResult = nil;
+    BOOL echo = [command.arguments objectAtIndex:0];
+    
+    NSError *error;
+    BOOL isSuccess = [ipc setCharging:echo error:&error];
+    if (!error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 - (void)barcodeStartScan:(CDVInvokedUrlCommand *)command
 {
@@ -396,6 +415,103 @@
     
     iq = [IPCIQ registerIPCIQ];
     [iq setDeveloperKey:key];
+    
+    ipc = [IPCDTDevices sharedDevice];
+}
+
+- (NSURL *)resourcePath
+{
+    NSURL *pathURL = [[NSBundle mainBundle] resourceURL];
+    return [pathURL URLByAppendingPathComponent:@"www/resources"];
+}
+
+- (void)getFirmwareFileInformation:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call getFirmwareFileInformation");
+    
+    CDVPluginResult *pluginResult = nil;
+    NSString *filePath = [command.arguments objectAtIndex:0];
+    filePath = [filePath stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
+    NSURL *fullFilePathURL = [[self resourcePath] URLByAppendingPathComponent:filePath];
+    
+    @try {
+        NSData *fileData = [NSData dataWithContentsOfURL:fullFilePathURL];
+        
+        if (!fileData) {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unable to read file. Check file path!"];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+        }
+        else {
+            
+            NSError *error = nil;
+            NSDictionary *firmwareInfo = [ipc getFirmwareFileInformation:fileData error:&error];
+            if (!error) {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:firmwareInfo];
+            } else {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+            }
+            
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            
+            return;
+        }
+        
+    } @catch (NSException *exception) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:exception.reason];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        
+        return;
+    }
+}
+
+- (void)updateFirmwareData:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call updateFirmwareData");
+    
+    ipc = [IPCDTDevices sharedDevice];
+    
+    CDVPluginResult *pluginResult = nil;
+    NSString *filePath = [command.arguments objectAtIndex:0];
+    filePath = [filePath stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
+    NSURL *fullFilePathURL = [[self resourcePath] URLByAppendingPathComponent:filePath];
+    
+    if (ipc.connstate != CONN_CONNECTED) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device is not connected!"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        
+        return;
+    }
+    else {
+        @try {
+            NSData *fileData = [NSData dataWithContentsOfURL:fullFilePathURL];
+            
+            if (!fileData) {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unable to read file. Check file path!"];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                return;
+            }
+            else {
+                NSError *error = nil;
+                BOOL isUpdate = [ipc updateFirmwareData:fileData validate:YES error:&error];
+                if (!error) {
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                } else {
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+                }
+                
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                
+                return;
+            }
+            
+        } @catch (NSException *exception) {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:exception.reason];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            
+            return;
+        }
+    }
 }
 
 - (void)connect:(CDVInvokedUrlCommand *)command
@@ -423,9 +539,12 @@
 
 - (void)barcodeData:(NSString *)barcode type:(int)type
 {
+    //*************
     // This send to regular barcodeData as string
     [self callback:@"Infinea.barcodeData(\"%@\", %i)", barcode, type];
     
+    
+    //*************
     // Convert to decimal
     const char *barcodes = [barcode UTF8String];
     NSMutableArray *barcodeDecimalArray = [NSMutableArray new];
@@ -508,5 +627,11 @@
     [self callback:@"Infinea.deviceButtonReleased(%i)", which];
 }
 
+- (void)firmwareUpdateProgress:(int)phase percent:(int)percent
+{
+    [self callback:@"Infinea.firmwareUpdateProgress(%i, %i)", phase, percent];
+}
+
 @end
+
 
