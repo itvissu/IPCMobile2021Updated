@@ -265,7 +265,7 @@
                                @"maximumCapacity": @(battInfo.maximumCapacity),
                                @"charging": @(battInfo.charging),
                                @"batteryChipType": @(battInfo.batteryChipType),
-                               @"extendedInfo": battInfo.extendedInfo == nil ? battInfo.extendedInfo : @""
+                               @"extendedInfo": battInfo.extendedInfo != nil ? battInfo.extendedInfo : @""
                                };
         
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:info];
