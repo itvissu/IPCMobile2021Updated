@@ -4,11 +4,10 @@
 #import <Cordova/CDV.h>
 #import <InfineaSDK/InfineaSDK.h>
 
-@interface InfineaSDKCordova : CDVPlugin <IPCDTDeviceDelegate> {
-    // Member variables go here.
-    IPCDTDevices *ipc;
-    IPCIQ *iq;
-}
+@interface InfineaSDKCordova : CDVPlugin <IPCDTDeviceDelegate>
+
+@property (strong, nonatomic) IPCIQ *iq;
+@property (strong, nonatomic) IPCDTDevices *ipc;
 
 - (void)coolMethod:(CDVInvokedUrlCommand*)command;
 
@@ -35,6 +34,10 @@
 - (void)setCharging:(CDVInvokedUrlCommand*)command;
 - (void)getFirmwareFileInformation:(CDVInvokedUrlCommand*)command;
 - (void)updateFirmwareData:(CDVInvokedUrlCommand*)command;
+- (void)emsrSetEncryption:(CDVInvokedUrlCommand*)command;
+- (void)emsrSetActiveHead:(CDVInvokedUrlCommand*)command;
+- (void)emsrConfigMaskedDataShowExpiration:(CDVInvokedUrlCommand*)command;
+- (void)emsrIsTampered:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -75,6 +78,87 @@
 }
 
 // SDK API
+- (void)emsrIsTampered:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call emsrIsTampered");
+    
+    CDVPluginResult* pluginResult = nil;
+    BOOL isTampered = NO;
+    
+    NSError *error = nil;
+    BOOL isSuccess = [self.ipc emsrIsTampered:&isTampered error:&error];
+    if (!error || isSuccess) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isTampered];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)emsrConfigMaskedDataShowExpiration:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call emsrConfigMaskedDataShowExpiration");
+    
+    CDVPluginResult* pluginResult = nil;
+    BOOL showExpiration = [[command.arguments objectAtIndex:0] boolValue];
+    BOOL showServiceCode = [[command.arguments objectAtIndex:1] boolValue];
+    int unmaskedDigitsAtStart = [[command.arguments objectAtIndex:2] intValue];
+    int unmaskedDigitsAtEnd = [[command.arguments objectAtIndex:3] intValue];
+    int unmaskedDigitsAfter = [[command.arguments objectAtIndex:4] intValue];
+    
+    NSError *error = nil;
+    BOOL isSuccess = [self.ipc emsrConfigMaskedDataShowExpiration:showExpiration showServiceCode:showServiceCode unmaskedDigitsAtStart:unmaskedDigitsAtStart unmaskedDigitsAtEnd:unmaskedDigitsAtEnd unmaskedDigitsAfter:unmaskedDigitsAfter error:&error];
+    if (!error || isSuccess) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)emsrSetActiveHead:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call emsrSetActiveHead");
+    
+    CDVPluginResult* pluginResult = nil;
+    int active = [[command.arguments objectAtIndex:0] intValue];
+    
+    NSError *error = nil;
+    BOOL isSuccess = [self.ipc emsrSetActiveHead:active error:&error];
+    if (!error || isSuccess) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)emsrSetEncryption:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"Call emsrSetEncryption");
+    
+    CDVPluginResult* pluginResult = nil;
+    int encryption = [[command.arguments objectAtIndex:0] intValue];
+    int keyID = [[command.arguments objectAtIndex:1] intValue];
+    NSDictionary *params = nil;
+    if (command.arguments.count > 2) {
+        params = [command.arguments objectAtIndex:2];
+    }
+    
+    NSError *error = nil;
+    BOOL isSuccess = [self.ipc emsrSetEncryption:encryption keyID:keyID params:params error:&error];
+    if (!error || isSuccess) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)setCharging:(CDVInvokedUrlCommand *)command
 {
     NSLog(@"Call setCharging");
@@ -83,8 +167,8 @@
     BOOL echo = [command.arguments objectAtIndex:0];
     
     NSError *error;
-    BOOL isSuccess = [ipc setCharging:echo error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc setCharging:echo error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -100,8 +184,8 @@
     CDVPluginResult* pluginResult = nil;
     
     NSError *error;
-    BOOL isSuccess = [ipc barcodeStartScan:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc barcodeStartScan:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -117,8 +201,8 @@
     CDVPluginResult* pluginResult = nil;
     
     NSError *error;
-    BOOL isSuccess = [ipc barcodeStopScan:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc barcodeStopScan:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -135,8 +219,8 @@
     
     NSError *error;
     int scanMode = 1;
-    BOOL isSuccess = [ipc barcodeGetScanMode:&scanMode error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc barcodeGetScanMode:&scanMode error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:scanMode];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -153,8 +237,8 @@
     int echo = [[command.arguments objectAtIndex:0] intValue];
     
     NSError *error;
-    BOOL isSuccess = [ipc barcodeSetScanMode:echo error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc barcodeSetScanMode:echo error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -171,8 +255,8 @@
     
     NSError *error;
     int scanButtonMode = 1;
-    BOOL isSuccess = [ipc barcodeGetScanButtonMode:&scanButtonMode error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc barcodeGetScanButtonMode:&scanButtonMode error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:scanButtonMode];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -189,8 +273,8 @@
     int echo = [[command.arguments objectAtIndex:0] intValue];
     
     NSError *error;
-    BOOL isSuccess = [ipc barcodeSetScanButtonMode:echo error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc barcodeSetScanButtonMode:echo error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -205,8 +289,8 @@
     
     CDVPluginResult* pluginResult = nil;
     NSError *error;
-    BOOL isSuccess = [ipc rfClose:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc rfClose:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -221,8 +305,8 @@
     
     CDVPluginResult* pluginResult = nil;
     NSError *error;
-    BOOL isSuccess = [ipc rfInit:CARD_SUPPORT_PICOPASS_ISO15|CARD_SUPPORT_TYPE_A|CARD_SUPPORT_TYPE_B|CARD_SUPPORT_ISO15|CARD_SUPPORT_FELICA error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc rfInit:CARD_SUPPORT_PICOPASS_ISO15|CARD_SUPPORT_TYPE_A|CARD_SUPPORT_TYPE_B|CARD_SUPPORT_ISO15|CARD_SUPPORT_FELICA error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -240,8 +324,8 @@
     int timeDisconnected = [[command.arguments objectAtIndex:1] intValue];
     
     NSError *error;
-    BOOL isSuccess = [ipc setAutoOffWhenIdle:timeIdle whenDisconnected:timeDisconnected error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc setAutoOffWhenIdle:timeIdle whenDisconnected:timeDisconnected error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -257,7 +341,7 @@
     CDVPluginResult* pluginResult = nil;
     
     NSError *error = nil;
-    DTBatteryInfo *battInfo = [ipc getBatteryInfo:&error];
+    DTBatteryInfo *battInfo = [self.ipc getBatteryInfo:&error];
     if (!error) {
         NSDictionary *info = @{@"voltage": @(battInfo.voltage),
                                @"capacity": @(battInfo.capacity),
@@ -284,8 +368,8 @@
     
     NSError *error;
     int current = 0;
-    BOOL isSuccess = [ipc getUSBChargeCurrent:&current error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc getUSBChargeCurrent:&current error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:current];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -302,8 +386,8 @@
     int echo = [[command.arguments objectAtIndex:0] intValue];
     
     NSError *error;
-    BOOL isSuccess = [ipc setUSBChargeCurrent:echo error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc setUSBChargeCurrent:echo error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -320,8 +404,8 @@
     
     NSError *error;
     BOOL isEnable = NO;
-    BOOL isSuccess = [ipc getPassThroughSync:&isEnable error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc getPassThroughSync:&isEnable error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnable];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -338,8 +422,8 @@
     BOOL echo = [command.arguments objectAtIndex:0];
     
     NSError *error;
-    BOOL isSuccess = [ipc setPassThroughSync:echo error:&error];
-    if (!error) {
+    BOOL isSuccess = [self.ipc setPassThroughSync:echo error:&error];
+    if (!error || isSuccess) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -355,7 +439,7 @@
     CDVPluginResult* pluginResult = nil;
     NSError *error = nil;
     
-    NSArray *connectedDevices = [ipc getConnectedDevicesInfo:&error];
+    NSArray *connectedDevices = [self.ipc getConnectedDevicesInfo:&error];
     
     if (!error) {
         NSMutableArray *devicesInfo = [NSMutableArray new];
@@ -388,7 +472,7 @@
     NSString* echo = [command.arguments objectAtIndex:0];
     
     NSError *error = nil;
-    DTDeviceInfo *deviceInfo = [ipc getConnectedDeviceInfo:[echo intValue] error:&error];
+    DTDeviceInfo *deviceInfo = [self.ipc getConnectedDeviceInfo:[echo intValue] error:&error];
     if (!error) {
         NSDictionary *info = @{@"deviceType": @(deviceInfo.deviceType),
                                @"connectionType": @(deviceInfo.connectionType),
@@ -413,10 +497,10 @@
     
     NSString* key = [command.arguments objectAtIndex:0];
     
-    iq = [IPCIQ registerIPCIQ];
-    [iq setDeveloperKey:key];
+    self.iq = [IPCIQ registerIPCIQ];
+    [self.iq setDeveloperKey:key];
     
-    ipc = [IPCDTDevices sharedDevice];
+    self.ipc = [IPCDTDevices sharedDevice];
 }
 
 - (NSURL *)resourcePath
@@ -445,7 +529,7 @@
         else {
             
             NSError *error = nil;
-            NSDictionary *firmwareInfo = [ipc getFirmwareFileInformation:fileData error:&error];
+            NSDictionary *firmwareInfo = [self.ipc getFirmwareFileInformation:fileData error:&error];
             if (!error) {
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:firmwareInfo];
             } else {
@@ -469,14 +553,14 @@
 {
     NSLog(@"Call updateFirmwareData");
     
-    ipc = [IPCDTDevices sharedDevice];
+    self.ipc = [IPCDTDevices sharedDevice];
     
     CDVPluginResult *pluginResult = nil;
     NSString *filePath = [command.arguments objectAtIndex:0];
     filePath = [filePath stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"/"]];
     NSURL *fullFilePathURL = [[self resourcePath] URLByAppendingPathComponent:filePath];
     
-    if (ipc.connstate != CONN_CONNECTED) {
+    if (self.ipc.connstate != CONN_CONNECTED) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device is not connected!"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         
@@ -493,8 +577,8 @@
             }
             else {
                 NSError *error = nil;
-                BOOL isUpdate = [ipc updateFirmwareData:fileData validate:YES error:&error];
-                if (!error) {
+                BOOL isUpdate = [self.ipc updateFirmwareData:fileData validate:YES error:&error];
+                if (!error || isUpdate) {
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 } else {
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
@@ -518,17 +602,17 @@
 {
     NSLog(@"Call connect");
     
-    ipc = [IPCDTDevices sharedDevice];
-    [ipc addDelegate:self];
-    [ipc connect];
+    self.ipc = [IPCDTDevices sharedDevice];
+    [self.ipc addDelegate:self];
+    [self.ipc connect];
 }
 
 - (void)disconnect:(CDVInvokedUrlCommand *)command
 {
     NSLog(@"Call disconnect");
     
-    ipc = [IPCDTDevices sharedDevice];
-    [ipc disconnect];
+    self.ipc = [IPCDTDevices sharedDevice];
+    [self.ipc disconnect];
 }
 
 #pragma mark - IPCDeviceDelegate
@@ -602,9 +686,9 @@
     [self callback:@"Infinea.magneticCardData(\"%@\", \"%@\", \"%@\")", track1, track2, track3];
 }
 
-- (void)magneticCardEncryptedData:(int)encryption tracks:(int)tracks data:(NSData *)data
+- (void)magneticCardEncryptedData:(int)encryption tracks:(int)tracks data:(NSData *)data track1masked:(NSString *)track1masked track2masked:(NSString *)track2masked track3:(NSString *)track3 source:(int)source
 {
-    [self callback:@"Infinea.magneticCardEncryptedData(%i, %i, \"%@\")", encryption, tracks, [NSString stringWithFormat:@"%@", data]];
+    [self callback:@"Infinea.magneticCardEncryptedData(%i, %i, \"%@\", \"%@\", \"%@\", \"%@\", %i)", encryption, tracks, [NSString stringWithFormat:@"%@", data], track1masked, track2masked, track3, source];
 }
 
 - (void)magneticCardReadFailed:(int)source reason:(int)reason

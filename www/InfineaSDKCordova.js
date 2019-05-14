@@ -181,8 +181,12 @@ exports.magneticCardReadFailed = function (source, reason) {
  * @param {int} encryption encryption algorithm used
  * @param {int} tracks contain information which tracks are successfully read and inside the encrypted data as bit fields, bit 1 corresponds to track 1, etc, so value of 7 means all tracks are read
  * @param {data} data contains the encrypted card data
+ * @param {string} track1masked Masked track 1 info
+ * @param {string} track2masked Masked track 2 info
+ * @param {string} track3 Track 3 info
+ * @param {int} source Source
  */
-exports.magneticCardEncryptedData = function (encryption, tracks, data) {
+exports.magneticCardEncryptedData = function (encryption, tracks, data, track1masked, track2masked, track3, source) {
     
 };
 
@@ -369,7 +373,7 @@ exports.barcodeGetScanButtonMode = function (success, error) {
 
 /**
  * Enable or Disable scan button.
- * @param {boolean} scanButtonMode true or false
+ * @param {bool} scanButtonMode true or false
  * @param {function} error The error reason will be passed in if available
  */
 exports.barcodeSetScanButtonMode = function (scanButtonMode, error) {
@@ -388,7 +392,7 @@ exports.barcodeGetScanMode = function (success, error) {
 /**
  * Set a specific scan mode, one of SCAN_MODES
  * @param {int} scanMode One of SCAN_MODES
- * @param {*} error The error reason will be passed in if available
+ * @param {function} error The error reason will be passed in if available
  */
 exports.barcodeSetScanMode = function (scanMode, error) {
     exec(null, error, 'InfineaSDKCordova', 'barcodeSetScanMode', [scanMode]);
@@ -410,4 +414,49 @@ exports.barcodeStartScan = function (success, error) {
  */
 exports.barcodeStopScan = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'barcodeStopScan', []);
+};
+               
+/**
+ * Set encryption type
+ * @param {function} success Called if execution success
+ * @param {function} error The error reason will be passed in if available
+ * @param {int} encryption algorithm used
+ * @param {int} keyID the ID of the key to use. The key needs to be suitable for the provided algorithm.
+ * @param {dictionary} params optional algorithm parameters.
+ */
+exports.emsrSetEncryption = function (encryption, keyID, params, success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'emsrSetEncryption', [encryption, keyID, params]);
+};
+               
+/**
+ * Set encryption active head
+ * @param {function} success Called if execution success
+ * @param {function} error The error reason will be passed in if available
+ * @param {int} activeHead The encrypted head to use with all other emsr functions
+ */
+exports.emsrSetActiveHead = function (activeHead, success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'emsrSetActiveHead', [activeHead]);
+};
+               
+/**
+ * Fine-tunes which part of the card data will be masked, and which will be sent in clear text for display/print purposes
+ * @param {function} success Called if execution success
+ * @param {function} error The error reason will be passed in if available
+ * @param {bool} showExpiration If set to TRUE, expiration date will be shown in clear text, otherwise will be masked
+ * @param {bool} showServiceCode if set to TRUE, service code will be shown in clear text, otherwise will be masked
+ * @param {int} unmaskedDigitsAtStart the number of digits to show in clear text at the start of the PAN, range from 0 to 6 (default is 4)
+ * @param {int} unmaskedDigitsAtEnd the number of digits to show in clear text at the end of the PAN, range from 0, to 4 (default is 4)
+ * @param {int} unmaskedDigitsAfter the number of digits to unmask after the PAN, i.e. 4 will give you the expiration, 7 will give expiration and service code (default is 0)
+ */
+exports.emsrConfigMaskedDataShowExpiration = function (showExpiration, showServiceCode, unmaskedDigitsAtStart, unmaskedDigitsAtEnd, unmaskedDigitsAfter, success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'emsrConfigMaskedDataShowExpiration', [showExpiration, showServiceCode, unmaskedDigitsAtStart, unmaskedDigitsAtEnd, unmaskedDigitsAfter]);
+};
+               
+/**
+ * Check if encrypted head is tampered
+ * @param {function} success Called if execution success, with result of tampered state
+ * @param {function} error The error reason will be passed in if available
+ */
+exports.emsrIsTampered = function (success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'emsrIsTampered', []);
 };
