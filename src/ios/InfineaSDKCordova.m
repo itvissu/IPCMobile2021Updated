@@ -145,7 +145,11 @@
     int keyID = [[command.arguments objectAtIndex:1] intValue];
     NSDictionary *params = nil;
     if (command.arguments.count > 2) {
-        params = [command.arguments objectAtIndex:2];
+        // Check for null
+        id object = [command.arguments objectAtIndex:2];
+        if ([object isKindOfClass:[NSDictionary class]]) {
+            params = (NSDictionary *)object;
+        }
     }
     
     NSError *error = nil;
