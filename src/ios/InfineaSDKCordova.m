@@ -1,4 +1,4 @@
-/********* InfineaSDKCordova.m Cordova Plugin Implementation *******/
+/********* InfineaSDKCordova.m Cordova Plugin Implementation ********/
 
 #import <WebKit/WebKit.h>
 #import <Cordova/CDV.h>

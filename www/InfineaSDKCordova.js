@@ -399,7 +399,7 @@ exports.barcodeSetScanMode = function (scanMode, error) {
 /**
  * Start scan engine. Can be used for on screen scan button
  * @param {function} success Called if execution success
- * @param {function} error The error reason will be passed in if available
+ * @param {function} error The error reason will be passed in if available.
  */
 exports.barcodeStartScan = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'barcodeStartScan', []);
