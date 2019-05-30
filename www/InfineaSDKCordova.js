@@ -1,6 +1,7 @@
 var exec = require('cordova/exec');
 
-// Enum
+// Enum...
+
 exports.SUPPORTED_DEVICE_TYPES = {
     /**
      All device types, used when setting active device
