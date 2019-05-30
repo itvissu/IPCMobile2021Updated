@@ -38,6 +38,8 @@
 - (void)emsrSetActiveHead:(CDVInvokedUrlCommand*)command;
 - (void)emsrConfigMaskedDataShowExpiration:(CDVInvokedUrlCommand*)command;
 - (void)emsrIsTampered:(CDVInvokedUrlCommand*)command;
+- (void)emsrGetKeyVersion:(CDVInvokedUrlCommand*)command;
+- (void)emsrGetDeviceInfo:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -78,6 +80,51 @@
 }
 
 // SDK API
+
+- (void)emsrGetKeyVersion:(CDVInvokedUrlCommand*)command{
+    NSLog(@"Call emsrGetKeyVersion");
+    
+    CDVPluginResult* pluginResult = nil;
+    int keyID = [command.arguments[0] intValue];
+    int keyVersion = -1;
+    NSError *error = nil;
+    
+    BOOL isSuccess = [self.ipc emsrGetKeyVersion:keyID keyVersion:&keyVersion error:&error];
+    
+    if(isSuccess){
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:keyVersion];
+    }
+    else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)emsrGetDeviceInfo:(CDVInvokedUrlCommand *)command{
+    NSLog(@"Call emsrGetDeviceInfo");
+    
+    CDVPluginResult* pluginResult = nil;
+    NSError *error = nil;
+    EMSRDeviceInfo *emsrInfo = [self.ipc emsrGetDeviceInfo:&error];
+    
+    if(emsrInfo){
+        NSDictionary *emsrInfoDictionary = @{@"ident": emsrInfo.ident,
+                                             @"serialNumber": [NSString stringWithFormat:@"%@", emsrInfo.serialNumber],
+                                             @"serialNumberString": emsrInfo.serialNumberString,
+                                             @"firmwareVersion": @(emsrInfo.firmwareVersion),
+                                             @"firmwareVersionString": emsrInfo.firmwareVersionString,
+                                             @"securityVersion": @(emsrInfo.securityVersion),
+                                             @"securityVersionString": emsrInfo.securityVersionString
+                                             };
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:emsrInfoDictionary];
+    }else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)emsrIsTampered:(CDVInvokedUrlCommand *)command
 {
     NSLog(@"Call emsrIsTampered");
@@ -720,6 +767,6 @@
     [self callback:@"Infinea.firmwareUpdateProgress(%i, %i)", phase, percent];
 }
 
-@end
 
+@end
 
