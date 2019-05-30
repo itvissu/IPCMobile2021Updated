@@ -110,6 +110,8 @@ exports.UPDATE_PHASE = {
     */
     UPDATE_COMPLETING: 4
 };
+               
+exports.
 
 
 // ******* SDK Delegates ********
@@ -229,8 +231,6 @@ exports.setDeveloperKey = function (key) {
 
 /**
  * Connect the hardware
- * @param {function} success
- * @param {function} error The error reason will be passed in if available
  */
 exports.connect = function () {
     exec(null, null, 'InfineaSDKCordova', 'connect', []);
@@ -238,8 +238,6 @@ exports.connect = function () {
 
 /**
  * Disconnect the hardware
- * @param {function} success
- * @param {function} error The error reason will be passed in if available
  */
 exports.disconnect = function () {
     exec(null, null, 'InfineaSDKCordova', 'disconnect', []);
@@ -267,7 +265,7 @@ exports.updateFirmwareData = function (resourcePath, error) {
 /**
  * Get the connected device info. Info will be passed to success function
  * @param {SUPPORTED_DEVICE_TYPES} deviceType
- * @param {function} success
+ * @param {function} success The connected device info will be passed in as dictionary parameter
  * @param {function} error The error reason will be passed in if available
  */
 exports.getConnectedDeviceInfo = function (deviceType, success, error) {
@@ -276,7 +274,7 @@ exports.getConnectedDeviceInfo = function (deviceType, success, error) {
 
 /**
  * Get the all connected devices info. Info will be passed to success function
- * @param {function} success
+ * @param {function} success The connected device infos will be passed in as array parameter contains multiple device infos
  * @param {function} error The error reason will be passed in if available
  */
 exports.getConnectedDevicesInfo = function (success, error) {
@@ -303,7 +301,7 @@ exports.setPassThroughSync = function (value, error) {
 
 /**
  * Get pass-thru sync enabled or disabled
- * @param {function} success The result will be passed in this function
+ * @param {function} success The result will be passed in as Boolean
  * @param {function} error The error reason will be passed in if available
  */
 exports.getPassThroughSync = function (success, error) {
@@ -321,7 +319,7 @@ exports.setUSBChargeCurrent = function (value, error) {
 
 /**
  * Get current USB charge current
- * @param {function} success The usb current will be passed in this function
+ * @param {function} success The usb current will be passed in as Int
  * @param {function} error The error reason will be passed in if available
  */
 exports.getUSBChargeCurrent = function (success, error) {
@@ -383,7 +381,7 @@ exports.barcodeSetScanButtonMode = function (scanButtonMode, error) {
 
 /**
  * Get the current barcode scan mode, one of SCAN_MODES
- * @param {function} success The scan mode will be passed in here, one of SCAN_MODES
+ * @param {function} success The scan mode will be passed in here, one of SCAN_MODES as Int
  * @param {function} error The error reason will be passed in if available
  */
 exports.barcodeGetScanMode = function (success, error) {
@@ -402,7 +400,7 @@ exports.barcodeSetScanMode = function (scanMode, error) {
 /**
  * Start scan engine. Can be used for on screen scan button
  * @param {function} success Called if execution success
- * @param {function} error The error reason will be passed in if available
+ * @param {function} error The error reason will be passed in if available.
  */
 exports.barcodeStartScan = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'barcodeStartScan', []);
@@ -460,4 +458,23 @@ exports.emsrConfigMaskedDataShowExpiration = function (showExpiration, showServi
  */
 exports.emsrIsTampered = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'emsrIsTampered', []);
+};
+
+/**
+ * Gets the key version from the keyID that is provided
+ * @param {function} success get key version as the parameter
+ * @param {function} error the Error reason will be passed in if available
+ * @param {int} keyID the ID of the key to get the version
+**/
+exports.emsrGetKeyVersion = function(keyID, success, error) {
+    exec(success, error, 'InfineaSDKCordova', 'emsrGetKeyVersion', [keyID]);
+};
+
+/*
+* Returns general information about the encrypted head - firmware version, ident, serial number
+ * @param {function} error pointer to NSError object, where error information is stored in case function fails. You can pass nil if you don't want that information
+*
+*/
+exports.emsrGetDeviceInfo = function(success, error){
+    exec(success, error, 'InfineaSDKCordova', 'emsrGetDeviceInfo',[]);
 };
