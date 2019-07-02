@@ -1,7 +1,7 @@
 # InfineaSDKCordova
 
 Prepare plugin:
-1) Request InfineaSDK.framework from IPC
+1) Download InfineaSDK.framework from IPC's developer portal https://developer.ipcmobile.com
 2) Copy InfineaSDK.framework to src/ios/ of the plugin
 
 New app:
