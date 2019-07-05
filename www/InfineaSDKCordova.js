@@ -110,8 +110,6 @@ exports.UPDATE_PHASE = {
     */
     UPDATE_COMPLETING: 4
 };
-               
-exports.
 
 
 // ******* SDK Delegates ********
