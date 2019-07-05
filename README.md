@@ -1,7 +1,7 @@
 # InfineaSDKCordova
 
 Prepare plugin:
-1) Request InfineaSDK.framework from IPC
+1) Download InfineaSDK.framework from IPC's developer portal https://developer.ipcmobile.com
 2) Copy InfineaSDK.framework to src/ios/ of the plugin
 
 New app:
@@ -12,7 +12,7 @@ New app:
 5) Build your app.
 
 Usage:
-1) Important: request a developer key from IPC.
+1) Important: request a developer key from IPC's developer portal https://developer.ipcmobile.com
 2) In the app set the developer key BEFORE calling any other functions
 `Infinea.setDeveloperKey("your_key");`
 3) Check out InfineaSDKCordova.js for available functions.
