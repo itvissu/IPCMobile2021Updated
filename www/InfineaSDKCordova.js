@@ -1,7 +1,6 @@
 var exec = require('cordova/exec');
 
-// Enum...
-
+// Enum
 exports.SUPPORTED_DEVICE_TYPES = {
     /**
      All device types, used when setting active device
@@ -110,8 +109,7 @@ exports.UPDATE_PHASE = {
     */
     UPDATE_COMPLETING: 4
 };
-
-
+               
 // ******* SDK Delegates ********
 // These functions will be called when the scanner receives these events
 /**
@@ -398,7 +396,7 @@ exports.barcodeSetScanMode = function (scanMode, error) {
 /**
  * Start scan engine. Can be used for on screen scan button
  * @param {function} success Called if execution success
- * @param {function} error The error reason will be passed in if available.
+ * @param {function} error The error reason will be passed in if available
  */
 exports.barcodeStartScan = function (success, error) {
     exec(success, error, 'InfineaSDKCordova', 'barcodeStartScan', []);
@@ -476,3 +474,18 @@ exports.emsrGetKeyVersion = function(keyID, success, error) {
 exports.emsrGetDeviceInfo = function(success, error){
     exec(success, error, 'InfineaSDKCordova', 'emsrGetDeviceInfo',[]);
 };
+      
+/**
+ Sets the sound, which is used upon successful barcode scan. This setting is not persistent and is best to configure it upon connect.
+ @note  A sample beep containing of 2 tones, each with 400ms duration, first one 2000Hz and second - 5000Hz will look int beepData[]=[2000,400,5000,400]
+ @param {function} success beep successfully enabled/disabled and/or tone changed
+ @param {function} error pointer to NSError object, where error information is stored in case function fails. You can pass nil if you don't want that information
+ @param {BOOL} enabled turns on or off beeping
+ @param {int array} data an array of integer values specifying pairs of tone(Hz) and duration(ms).
+ */
+
+exports.barcodeSetScanBeep = function(enabled, beepData, success, error){
+               exec(success, error, 'InfineaSDKCordova', 'barcodeSetScanBeep', [enabled, beepData]);
+};
+               
+});

@@ -1,4 +1,4 @@
-/********* InfineaSDKCordova.m Cordova Plugin Implementation ********/
+/********* InfineaSDKCordova.m Cordova Plugin Implementation *******/
 
 #import <WebKit/WebKit.h>
 #import <Cordova/CDV.h>
@@ -40,6 +40,7 @@
 - (void)emsrIsTampered:(CDVInvokedUrlCommand*)command;
 - (void)emsrGetKeyVersion:(CDVInvokedUrlCommand*)command;
 - (void)emsrGetDeviceInfo:(CDVInvokedUrlCommand*)command;
+- (void)barcodeSetScanBeep: (CDVInvokedUrlCommand *)command;
 
 @end
 
@@ -79,7 +80,35 @@
     }
 }
 
+
+
 // SDK API
+- (void)barcodeSetScanBeep: (CDVInvokedUrlCommand *)command{
+    NSLog(@"Call barocdeSetScanBeep");
+    
+    CDVPluginResult *pluginResult = nil;
+    BOOL enabled = [command.arguments[0] boolValue];
+    NSError *beepError = nil;
+    int volume = 100;
+    NSArray *beeps = command.arguments[1];
+
+    int numberOfData = (int)beeps.count;
+
+    int beepData[numberOfData];
+    for (int x = 0; x < numberOfData; x++) {
+        beepData[x] = [beeps[x] intValue];
+    }
+
+    BOOL isSuccess =[self.ipc barcodeSetScanBeep:enabled volume:volume beepData:beepData length:(int)sizeof(beepData) error:&beepError];
+    if(isSuccess){
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:enabled];
+    }
+    else{
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:beepError.localizedDescription];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 - (void)emsrGetKeyVersion:(CDVInvokedUrlCommand*)command{
     NSLog(@"Call emsrGetKeyVersion");
