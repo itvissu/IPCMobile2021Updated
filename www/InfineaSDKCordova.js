@@ -487,5 +487,3 @@ exports.emsrGetDeviceInfo = function(success, error){
 exports.barcodeSetScanBeep = function(enabled, beepData, success, error){
                exec(success, error, 'InfineaSDKCordova', 'barcodeSetScanBeep', [enabled, beepData]);
 };
-               
-});
