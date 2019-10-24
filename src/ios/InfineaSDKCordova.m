@@ -574,11 +574,14 @@
 - (void)setDeveloperKey:(CDVInvokedUrlCommand *)command
 {
     NSLog(@"Call setDeveloperKey");
-    
+    NSError *err = nil;
     NSString* key = [command.arguments objectAtIndex:0];
     
     self.iq = [IPCIQ registerIPCIQ];
-    [self.iq setDeveloperKey:key];
+    [self.iq setDeveloperKey:key withError:&err];
+    
+    if(err)
+        NSLog(@"Developer Key Error: %@", err.localizedDescription);
     
     self.ipc = [IPCDTDevices sharedDevice];
 }
