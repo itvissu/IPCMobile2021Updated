@@ -221,8 +221,8 @@ exports.firmwareUpdateProgress = function (phase, percent) {
  * This must be the first function that gets called, and a valid develop key must be passed in, and validated, BEFORE any other functions get executed.
  * @param {string} key The developer key given by IPC
  */
-exports.setDeveloperKey = function (key) {
-    exec(null, null, 'InfineaSDKCordova', 'setDeveloperKey', [key]);
+exports.setDeveloperKey = function (key, error) {
+    exec(null, error, 'InfineaSDKCordova', 'setDeveloperKey', [key]);
 };
 
 /**
