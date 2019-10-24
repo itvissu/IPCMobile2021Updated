@@ -573,16 +573,23 @@
 
 - (void)setDeveloperKey:(CDVInvokedUrlCommand *)command
 {
+    
     NSLog(@"Call setDeveloperKey");
-    NSError *err = nil;
+
     NSString* key = [command.arguments objectAtIndex:0];
-    
+
+    CDVPluginResult* pluginResult = nil;
+
+    NSError *error;
     self.iq = [IPCIQ registerIPCIQ];
-    [self.iq setDeveloperKey:key withError:&err];
-    
-    if(err)
-        NSLog(@"Developer Key Error: %@", err.localizedDescription);
-    
+    [self.iq setDeveloperKey:key withError:&error];
+    if (error) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        
+        NSLog(@"Developer Key Error: %@", error.localizedDescription);
+    }
+
     self.ipc = [IPCDTDevices sharedDevice];
 }
 
