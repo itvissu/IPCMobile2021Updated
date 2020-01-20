@@ -3,6 +3,11 @@
 #import <WebKit/WebKit.h>
 #import <Cordova/CDV.h>
 #import <InfineaSDK/InfineaSDK.h>
+/********* InfineaSDKCordova.m Cordova Plugin Implementation *******/
+
+#import <WebKit/WebKit.h>
+#import <Cordova/CDV.h>
+#import <InfineaSDK/InfineaSDK.h>
 
 @interface InfineaSDKCordova : CDVPlugin <IPCDTDeviceDelegate>
 
@@ -15,6 +20,7 @@
 - (void)setDeveloperKey:(CDVInvokedUrlCommand *)command;
 - (void)connect:(CDVInvokedUrlCommand*)command;
 - (void)disconnect:(CDVInvokedUrlCommand*)command;
+- (void)sdkVersion:(CDVInvokedUrlCommand *)command;
 - (void)getConnectedDeviceInfo:(CDVInvokedUrlCommand*)command;
 - (void)getConnectedDevicesInfo:(CDVInvokedUrlCommand*)command;
 - (void)setPassThroughSync:(CDVInvokedUrlCommand*)command;
@@ -81,8 +87,18 @@
 }
 
 
-
 // SDK API
+-(void)sdkVersion: (CDVInvokedUrlCommand *)command{
+    NSLog(@"Call SDK Version");
+    CDVPluginResult *pluginResult = nil;
+    int sdk = [self.ipc sdkVersion];
+    if(sdk){
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:sdk];
+        NSLog(@"SDK Version: %d", sdk);
+    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)barcodeSetScanBeep: (CDVInvokedUrlCommand *)command{
     NSLog(@"Call barocdeSetScanBeep");
     

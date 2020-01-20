@@ -240,6 +240,12 @@ exports.disconnect = function () {
 };
 
 /**
+ SDK version
+ */
+exports.sdkVersion = function (){
+    exec(null, null, 'InfineaSDKCordova', 'sdkVersion', []);
+}
+/**
  * Get information of a specific firmware file. Info will be passed to success function
  * @param {string} resourcePath The path to resource file with "platforms/ios/www/resources" as the root folder, your files must be copied to here. If you have "platforms/ios/www/resources/test.txt", only pass "test.txt" as resourcePath parameter.
  * @param {function} success The success function which will receive the information dictionary.
