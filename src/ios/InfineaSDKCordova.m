@@ -3,11 +3,6 @@
 #import <WebKit/WebKit.h>
 #import <Cordova/CDV.h>
 #import <InfineaSDK/InfineaSDK.h>
-/********* InfineaSDKCordova.m Cordova Plugin Implementation *******/
-
-#import <WebKit/WebKit.h>
-#import <Cordova/CDV.h>
-#import <InfineaSDK/InfineaSDK.h>
 
 @interface InfineaSDKCordova : CDVPlugin <IPCDTDeviceDelegate>
 
