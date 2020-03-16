@@ -789,7 +789,18 @@
 
 - (void)magneticCardEncryptedData:(int)encryption tracks:(int)tracks data:(NSData *)data track1masked:(NSString *)track1masked track2masked:(NSString *)track2masked track3:(NSString *)track3 source:(int)source
 {
-    [self callback:@"Infinea.magneticCardEncryptedData(%i, %i, \"%@\", \"%@\", \"%@\", \"%@\", %i)", encryption, tracks, [NSString stringWithFormat:@"%@", data], track1masked, track2masked, track3, source];
+	    // Ascii string
+    uint8_t *bytes=(uint8_t *)[data bytes];
+   // NSMutableString *escapedString = [@"" mutableCopy];
+    NSMutableString *escapedString = [[NSMutableString alloc]init];
+    NSMutableString *hexData = [[NSMutableString alloc] init];
+    for (int x=0; x<data.length;x++)
+    {
+        [hexData appendFormat:@"%02x", (unsigned int)bytes[x]];
+        [escapedString appendFormat:@"\\x%02X", bytes[x] ];
+    }
+
+    [self callback:@"Infinea.magneticCardEncryptedData(%i, %i, \"%@\", \"%@\", \"%@\", \"%@\", %i)", encryption, tracks, [NSString stringWithFormat:@"%@", escapedString], track1masked, track2masked, track3, source];
 }
 
 - (void)magneticCardReadFailed:(int)source reason:(int)reason
