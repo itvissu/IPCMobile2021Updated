@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-infineasdk",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "InfineaSDK Cordova plugin",
   "cordova": {
     "id": "cordova-plugin-infineasdk",

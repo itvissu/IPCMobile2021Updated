@@ -123,6 +123,7 @@
 
 - (void)emsrGetKeyVersion:(CDVInvokedUrlCommand*)command{
     NSLog(@"Call emsrGetKeyVersion");
+    [NSThread sleepForTimeInterval:.2];
     
     CDVPluginResult* pluginResult = nil;
     int keyID = [command.arguments[0] intValue];
