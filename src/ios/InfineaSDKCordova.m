@@ -1,4 +1,4 @@
-/********* InfineaSDKCordova.m Cordova Plugin Implementation *******/
+/********* InfineaSDKCordova.m Cordova Plugin Implementation 1.0.13 *******/
 
 #import <WebKit/WebKit.h>
 #import <Cordova/CDV.h>
@@ -790,7 +790,7 @@
 
 - (void)magneticCardEncryptedData:(int)encryption tracks:(int)tracks data:(NSData *)data track1masked:(NSString *)track1masked track2masked:(NSString *)track2masked track3:(NSString *)track3 source:(int)source
 {
-	    // Ascii string
+        // Ascii string
     uint8_t *bytes=(uint8_t *)[data bytes];
    // NSMutableString *escapedString = [@"" mutableCopy];
     NSMutableString *escapedString = [[NSMutableString alloc]init];
@@ -831,4 +831,3 @@
 
 
 @end
-
