@@ -491,5 +491,9 @@ exports.emsrGetDeviceInfo = function(success, error){
  */
 
 exports.barcodeSetScanBeep = function(enabled, beepData, success, error){
-               exec(success, error, 'InfineaSDKCordova', 'barcodeSetScanBeep', [enabled, beepData]);
+    exec(success, error, 'InfineaSDKCordova', 'barcodeSetScanBeep', [enabled, beepData]);
+};
+    
+exports.iHUBGetPortsInfo = function(success, error){
+    exec(success, error, 'InfineaSDKCordova', 'iHUBGetPortsInfo');
 };
