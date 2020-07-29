@@ -1,7 +1,7 @@
 # InfineaSDK-Cordova
 
 ## Prerequisites:
-1. Download InfineaSDK.framework from IPC's developer portal https://developer.ipcmobile.com
+* Download InfineaSDK.framework from IPC's developer portal https://developer.ipcmobile.com
 
 ## New Cordova app:
 1. Create new app
