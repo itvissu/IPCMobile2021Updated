@@ -81,7 +81,9 @@
         [(WKWebView*)self.webView evaluateJavaScript:javascript completionHandler:^(id result, NSError *error) {}];
     }
     else {
-        [(UIWebView*)self.webView stringByEvaluatingJavaScriptFromString: javascript];
+        if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)]) {
+            [self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:javascript];
+        }
     }
 }
 
